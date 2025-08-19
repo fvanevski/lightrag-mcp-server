@@ -21,7 +21,7 @@ Before running the server, you need to have Python 3.12+ and `uv` installed, as 
 
 1.  **Clone the repository.**
 
-    ```bash
+```bash
     # Use gh cli to clone repository
     gh repo clone fvanevski/lightrag_mcp
 
@@ -30,11 +30,11 @@ Before running the server, you need to have Python 3.12+ and `uv` installed, as 
 
     # Enter the repository directory
     cd lightrag_mcp
-   ```
+```
 
 2.  **Create a virtual environment and install the required dependencies:**
 
-    ```bash
+```bash
     # Create a virtual environment
     uv venv
 
@@ -43,7 +43,7 @@ Before running the server, you need to have Python 3.12+ and `uv` installed, as 
 
     # Install the dependencies
     uv pip install mcp httpx pydantic python-dotenv
-    ```
+```
 
 ## Running/Testing the Server
 
