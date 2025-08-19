@@ -11,27 +11,46 @@ The server exposes the entire LightRAG API surface, including document managemen
 -   **Authentication Support:** Works with both `X-API-Key` header and OAuth2 password-based (Bearer token) authentication.
 -   **User-Friendly Tools:** Provides clear, English-only tool descriptions with example inputs.
 -   **Structured Outputs:** Key tools like `query` and `query_stream` return structured JSON, making it easy for clients to parse the results.
+-   **Modular and Asynchronous:** The codebase is modular and uses an asynchronous HTTP client for better performance and maintainability.
 
 ## Prerequisites
 
-Before running the server, you need to have Python 3 installed.
+Before running the server, you need to have Python 3.12+ and `uv` installed, as well as a locally deployed LightRAG instance (see https://github.com/HKUDS/LightRAG).
 
 ## Installation
 
-1.  **Clone the repository or download the `lightrag_mcp_server.py` script.**
-
-2.  **Install the required Python dependencies:**
+1.  **Clone the repository.**
 
     ```bash
-    pip install "mcp-server>=0.2.0" requests pydantic python-dotenv
+    # Use gh cli to clone repository
+    gh repo clone fvanevski/lightrag_mcp
+
+    # Use git to clone repository
+    git clone https://github.com/fvanevski/lightrag_mcp.git
+
+    # Enter the repository directory
+    cd lightrag_mcp
+   ```
+
+2.  **Create a virtual environment and install the required dependencies:**
+
+    ```bash
+    # Create a virtual environment
+    uv venv
+
+    # Activate the virtual environment
+    source .venv/bin/activate
+
+    # Install the dependencies
+    uv pip install mcp httpx pydantic python-dotenv
     ```
 
-## Running the Server
+## Running/Testing the Server
 
-To start the MCP server, run the script from your terminal:
+To start the MCP server, run the script from your terminal using the Python interpreter from the virtual environment:
 
 ```bash
-python lightrag_mcp_server.py [OPTIONS]
+python lightrag_mcp.py [OPTIONS]
 ```
 
 By default, the server will attempt to connect to a LightRAG instance at `http://localhost:9621` with no authentication.
@@ -46,7 +65,7 @@ You can override the default settings using the following command-line flags:
 **Example:**
 
 ```bash
-python lightrag_mcp_server.py --service-url http://192.168.1.100:9621 --key "your-secret-api-key"
+python lightrag_mcp.py --service-url http://192.168.1.100:9621 --key "your-secret-api-key"
 ```
 
 ## Configuration
@@ -69,31 +88,29 @@ LIGHTRAG_API_KEY=your-secret-api-key
 
 You can connect to this server from any standard MCP client. Here’s how to do it in a VS Code environment that supports MCP:
 
-1.  **Start the Server:** Run `python lightrag_mcp_server.py` in a terminal. The server will start and listen for input on `stdin`.
+1.  **Configure Your MCP Client:** In your IDE/Coder's MCP client settings (e.g., in `mcp.json` for VS Code or `settings.json` for CLI coding agents such as Gemini CLI), configure a new MCP server that points to the script.
 
-2.  **Configure Your MCP Client:** In your IDE's MCP client settings (e.g., in `settings.json` for VS Code), configure a new model provider that points to the script.
-
-    **Example `settings.json` for a VS Code extension:**
+    **Example `mcp.json` entry for VS Code:**
 
     ```json
-    "mcp.languageModels": [
-      {
-        "modelId": "lightrag-local",
-        "displayName": "LightRAG (Local)",
-        "type": "process",
-        "command": [
+    "servers": {
+      "lightrag": {
+        "command": "uv",
+        "args": [
+          "run",
+          "--with",
+          "httpx,python-dotenv,pydantic,mcp",
+          "--",
           "python",
-          "/path/to/your/lightrag_mcp_server.py"
-        ],
-        "api": "mcp",
-        "version": "0.2"
+          "/path/to/your/project/lightrag_mcp.py"
+        ]
       }
-    ]
+    }
     ```
 
-    *Note: Replace `/path/to/your/lightrag_mcp_server.py` with the actual path to the script.*
+    *Note: Replace `/path/to/your/project` with the actual path to the project directory.*
 
-3.  **Use the Tools:** Once connected, you can use the exposed tools in your chat or agent interactions. For example, to perform a RAG query, you could send the following tool call:
+2.  **Use the Tools:** Once connected, you can use the exposed tools in your chat or agent interactions with natural language queries or structured calls. For example, to perform a RAG query, you could send the following structured tool call:
 
     ```json
     {
