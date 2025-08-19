@@ -10,63 +10,86 @@ The server exposes the entire LightRAG API surface, including document managemen
 -   **Flexible Configuration:** Configure the server via command-line flags, environment variables, or a `.env` file.
 -   **Authentication Support:** Works with both `X-API-Key` header and OAuth2 password-based (Bearer token) authentication.
 -   **User-Friendly Tools:** Provides clear, English-only tool descriptions with example inputs.
--   **Structured Outputs:** Key tools like `query` and `query_stream` return structured JSON, making it easy for clients to parse the results.
+-   **Conversational Outputs:** Key tools like `query` return conversational responses, making it easy for clients to use the results.
 -   **Modular and Asynchronous:** The codebase is modular and uses an asynchronous HTTP client for better performance and maintainability.
 
 ## Prerequisites
 
-Before running the server, you need to have Python 3.12+ and `uv` installed, as well as a locally deployed LightRAG instance (see https://github.com/HKUDS/LightRAG).
+Before running the server, you need to have Python 3.12+ and `uv` installed, as well as a locally deployed LightRAG instance (see https://github.com/HKUDS/LightRAG). You will also need Node.js and `npx` to run the MCP Inspector tool for testing.
 
 ## Installation
 
 1.  **Clone the repository.**
 
 ```bash
-    # Use gh cli to clone repository
-    gh repo clone fvanevski/lightrag_mcp
+# Use gh cli to clone repository
+gh repo clone fvanevski/lightrag_mcp
 
-    # Use git to clone repository
-    git clone https://github.com/fvanevski/lightrag_mcp.git
+# Use git to clone repository
+git clone https://github.com/fvanevski/lightrag_mcp.git
 
-    # Enter the repository directory
-    cd lightrag_mcp
+# Enter the repository directory
+cd lightrag_mcp
 ```
 
 2.  **Create a virtual environment and install the required dependencies:**
 
 ```bash
-    # Create a virtual environment
-    uv venv
+# Create a virtual environment
+uv venv
 
-    # Activate the virtual environment
-    source .venv/bin/activate
+# Activate the virtual environment
+source .venv/bin/activate
 
-    # Install the dependencies
-    uv pip install mcp httpx pydantic python-dotenv
+# Install the dependencies
+uv pip install mcp httpx pydantic python-dotenv
 ```
 
-## Running/Testing the Server
+## Running and Testing the Server
 
-To start the MCP server, run the script from your terminal using the Python interpreter from the virtual environment:
+The MCP server is a command-line application that communicates over standard I/O. To use it, a client (like an IDE, a coding agent, or an inspector tool) must launch the server process.
+
+### Running for Diagnostics
+
+You can try to run the script directly from your terminal to see if it starts without errors. This is a quick way to validate your Python environment and the script's basic syntax.
 
 ```bash
-python lightrag_mcp.py [OPTIONS]
+python lightrag_mcp.py
 ```
 
-By default, the server will attempt to connect to a LightRAG instance at `http://localhost:9621` with no authentication.
+However, the server will simply start and wait for input, so you won't be able to interact with it directly from your terminal.
 
-### Command-Line Options
+### Testing with MCP Inspector
 
-You can override the default settings using the following command-line flags:
+The recommended way to test the server interactively is with **MCP Inspector**. It runs as a command-line tool and provides an interactive shell for sending requests to your server.
 
--   `--service-url URL`: Sets the base URL of the LightRAG API.
--   `--key KEY`: Provides the API key if the LightRAG server requires one.
-
-**Example:**
+1.  **Launch the Inspector:**
+    You can run the inspector without a permanent installation using `npx`. The inspector will launch your MCP server script for you. From your project directory, run:
 
 ```bash
-python lightrag_mcp.py --service-url http://192.168.1.100:9621 --key "your-secret-api-key"
+# Run the inspector with `uv run --with <dependencies> -- python3 <script>`
+npx @modelcontextprotocol/inspector uv run --with httpx,python-dotenv,pydantic,mcp -- python3 lightrag_mcp.py
 ```
+
+    Even if you have your virtual environment active, the `python` command as executed by the inspector will not correctly point to the interpreter with the necessary dependencies, thus we use uv instead with the `--with` flag.
+
+2.  **Interact with the Server:**
+    Once the inspector starts, you can click the "Connect" button to establish a session with your server. You can then use commands like `list_tools` and `call_tool` to interact with it.
+
+    **Example session:**
+
+```
+# List all available tools
+> list_tools
+
+# Call the 'health' tool to check the connection to the LightRAG API
+> call_tool health
+
+# Call the 'query' tool with arguments
+> call_tool query '''{"query": "What is LightRAG?", "mode": "hybrid"}'''
+```
+
+This provides a reliable way to test all the tools and verify that the server is working as expected.
 
 ## Configuration
 
@@ -88,22 +111,24 @@ LIGHTRAG_API_KEY=your-secret-api-key
 
 You can connect to this server from any standard MCP client. Here’s how to do it in a VS Code environment that supports MCP:
 
-1.  **Configure Your MCP Client:** In your IDE/Coder's MCP client settings (e.g., in `mcp.json` for VS Code or `settings.json` for CLI coding agents such as Gemini CLI), configure a new MCP server that points to the script.
+1.  **Configure Your MCP Client:** In your IDE's MCP client settings (e.g., in `mcp.json` for VS Code), configure a new MCP server that points to the script.
 
     **Example `mcp.json` entry for VS Code:**
 
     ```json
-    "servers": {
-      "lightrag": {
-        "command": "uv",
-        "args": [
-          "run",
-          "--with",
-          "httpx,python-dotenv,pydantic,mcp",
-          "--",
-          "python",
-          "/path/to/your/project/lightrag_mcp.py"
-        ]
+    {
+      "servers": {
+        "lightrag": {
+          "command": "uv",
+          "args": [
+            "run",
+            "--with",
+            "httpx,python-dotenv,pydantic,mcp",
+            "--",
+            "python",
+            "/path/to/your/project/lightrag_mcp.py"
+          ]
+        }
       }
     }
     ```
@@ -123,4 +148,4 @@ You can connect to this server from any standard MCP client. Here’s how to do 
     }
     ```
 
-    The server will execute the query against your LightRAG instance and return a structured JSON response.
+    The server will execute the query against your LightRAG instance and return a conversational response.

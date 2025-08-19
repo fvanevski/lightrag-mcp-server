@@ -188,10 +188,10 @@ async def call_tool(name: str, arguments: dict) -> list[TextContent]:
             qres = await client.query(req, want_obj=True)
             # Expected schema: {"response": "..."}
             if isinstance(qres, dict) and "response" in qres:
-                out = {"request": req, "response": qres["response"]}
+                response_text = qres["response"]
             else:
-                out = {"request": req, "response": qres}
-            return [_as_json_content(out)]
+                response_text = str(qres)
+            return [TextContent(type="text", text=response_text)]
 
         if name == "query_stream":
             try:
