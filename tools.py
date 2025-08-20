@@ -217,8 +217,15 @@ def list_tools(enabled_tools: list[str] | None = None) -> list[Tool]:
         Tool(
             name="query",
             description=(
-                "RAG query (POST /query). Returns **structured output**: {request, response}.\n"
-                "Example input: {\"query\":\"Summarize recent docs\", \"mode\":\"hybrid\", \"top_k\":5, \"only_need_context\": false}"
+                """RAG query (POST /query). Returns **structured output**: {request, response}.
+                Query Modes:
+                  naive: Simple vector similarity search. Use for quick, general semantic search.
+                  local: Entity-focused retrieval. Use for questions about a specific person, place, or thing.
+                  global: Relationship-focused retrieval. Use for understanding connections between entities.
+                  hybrid: Combined entity and relationship retrieval. Use for comprehensive answers.
+                  mix: LLM-enhanced keyword retrieval. Use for complex queries.
+                  bypass: Direct to LLM. Use for chatting directly with the LLM.
+                Example input: {"query":"Summarize recent docs", "mode":"hybrid", "top_k":5, "only_need_context": false}"""
             ),
             inputSchema=QueryRequest.model_json_schema(),
         ),
