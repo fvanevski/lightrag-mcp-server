@@ -225,6 +225,14 @@ def list_tools(enabled_tools: list[str] | None = None) -> list[Tool]:
                   hybrid: Combined entity and relationship retrieval. Use for comprehensive answers.
                   mix: LLM-enhanced keyword retrieval. Use for complex queries.
                   bypass: Direct to LLM. Use for chatting directly with the LLM.
+                Other Important Parameters:
+                  only_need_context: If True, returns the retrieved context without generating a response. Useful for debugging.
+                  response_type: Defines the response format. Examples: 'Multiple Paragraphs', 'Single Paragraph', 'Bullet Points'.
+                  top_k: Number of top items to retrieve from the knowledge graph.
+                  chunk_top_k: Number of text chunks to retrieve from vector search.
+                  conversation_history: A list of past user/assistant messages to maintain context.
+                  user_prompt: A custom prompt to guide the LLM's response.
+                  enable_rerank: If True, reranks the retrieved text chunks for better relevance.
                 Example input: {"query":"Summarize recent docs", "mode":"hybrid", "top_k":5, "only_need_context": false}"""
             ),
             inputSchema=QueryRequest.model_json_schema(),
