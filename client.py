@@ -15,7 +15,7 @@ class LightRagHttpClient:
 
     def __init__(self, base_url: Optional[str] = None, api_key: Optional[str] = None, timeout: int = 150):
         # resolve (CLI/env/.env → defaults)
-        self.base_url, self.api_key = resolve_config()
+        self.base_url, self.api_key, _ = resolve_config()
         if base_url:
             self.base_url = base_url.rstrip("/")
         if api_key is not None:

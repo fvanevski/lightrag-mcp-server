@@ -1,0 +1,86 @@
+# ----------------- LightRAG MCP Server Tool Configuration ------------------
+#
+# This file controls which tools are exposed by the MCP server.
+#
+# To enable a tool, add its name to the `enabled_tools` list.
+# To disable a tool, remove it from the list or comment it out (using #).
+#
+# The order of tools in this file does not matter.
+#
+# For more details on each tool, refer to the LightRAG API documentation
+# or the tool definitions in `tools.py`.
+#
+# ---------------------------------------------------------------------------
+
+enabled_tools:
+  # ------------------- Query Tools -------------------
+  # - Standard RAG query. Returns a single, complete response. (Recommended for conversational AI)
+  - query
+  # - Streamed RAG query. Returns a stream of JSON objects containing response fragments, not suitable for conversational AI.
+  # - query_stream
+
+  # ----------------- Ingestion Tools -----------------
+  # - Upload a single file for processing.
+  - documents_upload_file
+  # - Insert a single text snippet.
+  - documents_insert_text
+  # - Scan the configured input directory.
+  - documents_scan
+  # - Upload multiple files at once.
+  # - documents_upload_files
+  # - Insert multiple text snippets at once.
+  # - documents_insert_texts
+  # - Clear all documents and files. (Use with caution!)
+  # - documents_clear_all
+
+  # ------------------- Graph Tools -------------------
+  # - Retrieve a subgraph by its label.
+  - graphs_get
+  # - List all labels in the graph.
+  # - graph_labels
+  # - Check if an entity exists in the graph.
+  # - graph_entity_exists
+  # - Update an entity's properties.
+  # - graph_update_entity
+  # - Update a relation's properties.
+  # - graph_update_relation
+
+  # --------------- Document Management ---------------
+  # - List documents with their processing status.
+  # - documents_list_statuses
+  # - Get the status of the document processing pipeline.
+  # - documents_pipeline_status
+  # - Delete specific documents by their IDs.
+  # - documents_delete_by_ids
+  # - Get a paginated list of documents.
+  # - documents_paginated
+  # - Get the number of documents by status.
+  # - documents_status_counts
+  # - Track the processing status of a specific job.
+  # - documents_track_status
+  # - Clear the LLM cache.
+  # - documents_clear_cache
+  # - Delete an entity from the knowledge graph.
+  # - documents_delete_entity
+  # - Delete a relation from the knowledge graph.
+  # - documents_delete_relation
+
+  # ----------------- System & Auth -----------------
+  # - Check the health of the LightRAG server.
+  # - health
+  # - Check the authentication status.
+  # - auth_status
+  # - Log in to the LightRAG server.
+  # - auth_login
+
+  # ----------------- Ollama Compatible -----------------
+  # - Get Ollama version info.
+  # - ollama_version
+  # - List available Ollama models.
+  # - ollama_tags
+  # - List running Ollama models.
+  # - ollama_ps
+  # - Send a generation request to the underlying LLM.
+  # - ollama_generate
+  # - Send a chat request to the underlying LLM.
+  # - ollama_chat

@@ -1,13 +1,13 @@
 # LightRAG MCP Server
 
-This repository contains a Model Context Protocol (MCP) server that provides a tool-based interface to a locally running LightRAG HTTP API. It is designed for use with MCP-compatible clients, such as those found in IDEs like Visual Studio Code, allowing developers and models to interact with all of LightRAG's capabilities programmatically.
+This repository contains a Model Context Protocol (MCP) server that provides a tool-based interface to a locally running LightRAG HTTP API. It is designed for use with MCP-compatible clients, such as those found in IDEs like Visual Studio Code, allowing developers and models to interact with LightRAG's capabilities programmatically.
 
-The server exposes the entire LightRAG API surface, including document management, RAG queries, knowledge graph interactions, and Ollama-compatible endpoints.
+The server exposes a curated set of tools by default, with the option to enable more as needed through a configuration file.
 
 ## Features
 
--   **Full API Coverage:** Exposes all endpoints from the LightRAG OpenAPI specification (version `0204`).
--   **Flexible Configuration:** Configure the server via command-line flags, environment variables, or a `.env` file.
+-   **Configurable Tool Exposure:** Exposes a default set of tools for common use cases, with the ability to enable any other tool from the LightRAG API via a simple configuration file.
+-   **Flexible Configuration:** Configure the server via a `config.yaml` file, command-line flags, environment variables, or a `.env` file.
 -   **Authentication Support:** Works with both `X-API-Key` header and OAuth2 password-based (Bearer token) authentication.
 -   **User-Friendly Tools:** Provides clear, English-only tool descriptions with example inputs.
 -   **Conversational Outputs:** Key tools like `query` return conversational responses, making it easy for clients to use the results.
@@ -42,7 +42,7 @@ uv venv
 source .venv/bin/activate
 
 # Install the dependencies
-uv pip install mcp httpx pydantic python-dotenv
+uv pip install mcp httpx pydantic python-dotenv pyyaml
 ```
 
 ## Running and Testing the Server
@@ -68,7 +68,7 @@ The recommended way to test the server interactively is with **MCP Inspector**. 
 
 ```bash
 # Run the inspector with `uv run --with <dependencies> -- python3 <script>`
-npx @modelcontextprotocol/inspector uv run --with httpx,python-dotenv,pydantic,mcp -- python3 lightrag_mcp.py
+npx @modelcontextprotocol/inspector uv run --with httpx,python-dotenv,pydantic,mcp,pyyaml -- python3 lightrag_mcp.py
 ```
 
     Even if you have your virtual environment active, the `python` command as executed by the inspector will not correctly point to the interpreter with the necessary dependencies, thus we use uv instead with the `--with` flag.
@@ -93,18 +93,33 @@ This provides a reliable way to test all the tools and verify that the server is
 
 ## Configuration
 
-In addition to command-line flags, the server can be configured using environment variables or a `.env` file in your project's root directory. The order of precedence is: **Command-Line Flags > Environment Variables > `.env` File > Defaults**.
+The server can be configured using a `config.yaml` file, command-line flags, environment variables, or a `.env` file. The order of precedence is: **Command-Line Flags > Environment Variables > `config.yaml` > `.env` File > Defaults**.
+
+### `config.yaml`
+
+The easiest way to manage your tools is with the `config.yaml` file. It allows you to enable or disable tools by adding or removing them from a list. Each tool is commented with a description of its function.
+
+By default, the server enables the following tools:
+- `query`
+- `documents_upload_file`
+- `documents_insert_text`
+- `documents_scan`
+- `graphs_get`
+
+To enable other tools, simply uncomment them in the `enabled_tools` list in your `config.yaml` file.
 
 ### Environment Variables
 
 -   `LIGHTRAG_BASE_URL`: The base URL of the LightRAG API (e.g., `http://localhost:9621`).
 -   `LIGHTRAG_API_KEY`: The API key for your LightRAG instance, if required.
+-   `LIGHTRAG_TOOLS`: A comma-separated list of tools to enable (e.g., `query,documents_scan`).
 
 **Example `.env` file:**
 
 ```
 LIGHTRAG_BASE_URL=http://localhost:9621
 LIGHTRAG_API_KEY=your-secret-api-key
+LIGHTRAG_TOOLS=query,documents_scan,graphs_get
 ```
 
 ## Usage with an MCP Client (VS Code Example)
@@ -123,7 +138,7 @@ You can connect to this server from any standard MCP client. Here’s how to do 
           "args": [
             "run",
             "--with",
-            "httpx,python-dotenv,pydantic,mcp",
+            "httpx,python-dotenv,pydantic,mcp,pyyaml",
             "--",
             "python",
             "/path/to/your/project/lightrag_mcp.py"

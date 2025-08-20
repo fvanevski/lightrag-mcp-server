@@ -95,11 +95,16 @@ async def read_resource(uri: AnyUrl) -> str:
 
 @app.list_tools()
 async def list_tools_mcp() -> list[Tool]:
-    return list_tools()
+    _, _, enabled_tools = resolve_config()
+    return list_tools(enabled_tools)
 
 
 @app.call_tool()
 async def call_tool(name: str, arguments: dict) -> list[TextContent]:
+    _, _, enabled_tools = resolve_config()
+    if name not in enabled_tools:
+        return [TextContent(type="text", text=f"Error: Tool '{name}' is not enabled.")]
+
     client = LightRagHttpClient()
     try:
         # -------- system & auth --------
@@ -267,10 +272,11 @@ async def call_tool(name: str, arguments: dict) -> list[TextContent]:
 async def main():
     from mcp.server.stdio import stdio_server
 
-    base, key = resolve_config()
+    base, key, enabled_tools = resolve_config()
     logger.info("Starting LightRAG MCP server …")
     logger.info("Base URL: %s", base)
     logger.info("API Key: %s", "<set>" if key else "<none>")
+    logger.info("Enabled tools: %s", ", ".join(enabled_tools))
 
     try:
         async with stdio_server() as (read_stream, write_stream):

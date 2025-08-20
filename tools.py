@@ -1,8 +1,9 @@
 from mcp.types import Tool
 from models import QueryRequest
 
-def list_tools() -> list[Tool]:
-    return [
+def list_tools(enabled_tools: list[str] | None = None) -> list[Tool]:
+    """Return a list of Tool objects, optionally filtered by name."""
+    all_tools = [
         # ---------------- system & auth ----------------
         Tool(
             name="health",
@@ -348,3 +349,7 @@ def list_tools() -> list[Tool]:
             },
         ),
     ]
+    if not enabled_tools:
+        return all_tools
+    # Filter the tools based on the enabled_tools list
+    return [t for t in all_tools if t.name in enabled_tools]
