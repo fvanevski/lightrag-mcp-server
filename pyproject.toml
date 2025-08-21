@@ -1,0 +1,13 @@
+[project]
+name = "lightrag_mcp"
+version = "0.1.0"
+description = "MCP server implementation of LightRAG API"
+readme = "README.md"
+requires-python = ">=3.12"
+dependencies = [
+    "httpx",
+    "python-dotenv",
+    "pydantic",
+    "mcp",
+    "pyyaml"
+]
