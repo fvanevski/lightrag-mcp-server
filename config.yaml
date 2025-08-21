@@ -27,7 +27,7 @@ enabled_tools:
   # Scan the configured input directory.
   - documents_scan
   # Upload multiple files at once.
-  # - documents_upload_files
+  - documents_upload_files
   # Insert multiple text snippets at once.
   # - documents_insert_texts
   # Clear all documents and files. (Use with caution!)
@@ -37,19 +37,19 @@ enabled_tools:
   # Retrieve a subgraph by its label.
   - graphs_get
   # List all labels in the graph.
-  # - graph_labels
+  - graph_labels
   # Check if an entity exists in the graph.
-  # - graph_entity_exists
+  - graph_entity_exists
   # Update an entity's properties.
-  # - graph_update_entity
+  - graph_update_entity
   # Update a relation's properties.
-  # - graph_update_relation
+  - graph_update_relation
 
   # --------------- Document Management ---------------
   # List documents with their processing status.
   # - documents_list_statuses
   # Get the status of the document processing pipeline.
-  # - documents_pipeline_status
+  - documents_pipeline_status
   # Delete specific documents by their IDs.
   # - documents_delete_by_ids
   # Get a paginated list of documents.
@@ -61,9 +61,9 @@ enabled_tools:
   # Clear the LLM cache.
   # - documents_clear_cache
   # Delete an entity from the knowledge graph.
-  # - documents_delete_entity
+  - documents_delete_entity
   # Delete a relation from the knowledge graph.
-  # - documents_delete_relation
+  - documents_delete_relation
 
   # ----------------- System & Auth -----------------
   # Check the health of the LightRAG server.

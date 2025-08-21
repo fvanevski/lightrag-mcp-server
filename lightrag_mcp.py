@@ -59,14 +59,17 @@ except ImportError as e:
 # .env support
 _DOTENV_LOADED = load_dotenv(find_dotenv())
 
+# Global variable to store the enabled tools
+enabled_tools = []
+
 # --------------------------- logging ---------------------------------------
 logging.basicConfig(
     level=logging.INFO,
     format="%(asctime)s - %(name)s - %(levelname)s - %(message)s",
 )
 logger = logging.getLogger("LightRAG-MCP")
-if _DOTENV_LOADED:
-    logger.info("Loaded environment from .env")
+# if _DOTENV_LOADED:
+#     logger.info("Loaded environment from .env")
 
 
 # --------------------------- helpers ---------------------------------------
@@ -95,13 +98,13 @@ async def read_resource(uri: AnyUrl) -> str:
 
 @app.list_tools()
 async def list_tools_mcp() -> list[Tool]:
-    _, _, enabled_tools = resolve_config()
+    """The list of tools is determined by the config resolution logic."""
     return list_tools(enabled_tools)
 
 
 @app.call_tool()
 async def call_tool(name: str, arguments: dict) -> list[TextContent]:
-    _, _, enabled_tools = resolve_config()
+    """Call the tool if it's in the enabled list."""
     if name not in enabled_tools:
         return [TextContent(type="text", text=f"Error: Tool '{name}' is not enabled.")]
 
@@ -272,11 +275,12 @@ async def call_tool(name: str, arguments: dict) -> list[TextContent]:
 async def main():
     from mcp.server.stdio import stdio_server
 
-    base, key, enabled_tools = resolve_config()
-    logger.info("Starting LightRAG MCP server …")
-    logger.info("Base URL: %s", base)
-    logger.info("API Key: %s", "<set>" if key else "<none>")
-    logger.info("Enabled tools: %s", ", ".join(enabled_tools))
+    global enabled_tools
+    _, _, enabled_tools = resolve_config()
+    # logger.info("Starting LightRAG MCP server …")
+    # logger.info("Base URL: %s", base)
+    # logger.info("API Key: %s", "<set>" if key else "<none>")
+    # logger.info("Enabled tools: %s", ", ".join(enabled_tools))
 
     try:
         async with stdio_server() as (read_stream, write_stream):

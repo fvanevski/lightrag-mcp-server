@@ -1,7 +1,10 @@
 import os
 import argparse
+import logging
 from typing import Optional, List
 import yaml
+
+logger = logging.getLogger(__name__)
 
 # Tools we want to expose by default.
 # A comma-separated string of these is the default for the --tools flag.
@@ -19,15 +22,21 @@ DEFAULT_TOOLS = [
 def _load_tools_from_yaml(config_path: str) -> Optional[List[str]]:
     """Load the list of enabled tools from a YAML config file."""
     if not os.path.exists(config_path):
+        logger.warning(f"YAML config file not found at: {config_path}")
         return None
     try:
         with open(config_path, 'r') as f:
             config_data = yaml.safe_load(f)
         if isinstance(config_data, dict) and 'enabled_tools' in config_data:
             if isinstance(config_data['enabled_tools'], list):
+                logger.info(f"Loaded tools from {config_path}: {config_data['enabled_tools']}")
                 return config_data['enabled_tools']
-    except Exception:
-        pass
+            else:
+                logger.warning(f"'enabled_tools' in {config_path} is not a list.")
+        else:
+            logger.warning(f"'enabled_tools' key not found in {config_path}.")
+    except Exception as e:
+        logger.error(f"Error parsing YAML file {config_path}: {e}")
     return None
 
 def resolve_config() -> tuple[str, Optional[str], List[str]]:
@@ -47,10 +56,10 @@ def resolve_config() -> tuple[str, Optional[str], List[str]]:
     yaml_tools = _load_tools_from_yaml('config.yaml')
 
     # Determine the source for tools
-    if env_tools:
-        tools_source = env_tools
-    elif yaml_tools is not None:
+    if yaml_tools is not None:
         tools_source = ",".join(yaml_tools)
+    elif env_tools:
+        tools_source = env_tools
     else:
         tools_source = ",".join(DEFAULT_TOOLS)
 
