@@ -21,29 +21,29 @@ Before running the server, you need to have Python 3.12+ and `uv` installed, as 
 
 1. **Clone the repository.**
 
-```bash
-# Use gh cli to clone repository
-gh repo clone fvanevski/lightrag_mcp
-
-# Use git to clone repository
-git clone https://github.com/fvanevski/lightrag_mcp.git
-
-# Enter the repository directory
-cd lightrag_mcp
-```
+   ```bash
+   # Use gh cli to clone repository
+   gh repo clone fvanevski/lightrag_mcp
+   
+   # Alternatively, you can use git to clone repository
+   # git clone https://github.com/fvanevski/lightrag_mcp.git
+   
+   # Enter the repository directory
+   cd lightrag_mcp
+   ```
 
 2. **Create a virtual environment and install the required dependencies:**
 
-```bash
-# Create a virtual environment
-uv venv
-
-# Activate the virtual environment
-source .venv/bin/activate
-
-# Install the dependencies
-uv sync
-```
+   ```bash
+   # Create a virtual environment
+   uv venv
+   
+   # Activate the virtual environment
+   source .venv/bin/activate
+   
+   # Install the dependencies
+   uv sync
+   ```
 
 ## Running and Testing the Server
 
@@ -64,32 +64,33 @@ However, the server will simply start and wait for input, so you won't be able t
 The recommended way to test the server interactively is with **MCP Inspector**. It runs as a command-line tool and provides an interactive shell for sending requests to your server.
 
 1. **Launch the Inspector:**
-    You can run the inspector without a permanent installation using `npx`. The inspector will launch your MCP server script for you. From your project directory, run:
 
-```bash
-# Run the inspector with `uv run --with <dependencies> -- python3 <script>`
-npx @modelcontextprotocol/inspector uv run --with httpx,python-dotenv,pydantic,mcp,pyyaml -- python3 lightrag_mcp.py
-```
+   You can run the inspector without a permanent installation using `npx`. The inspector will launch your MCP server script for you. From your project directory, run:
 
-Even if you have your virtual environment active, the `python` command as executed by the inspector will not correctly point to the interpreter with the necessary dependencies, thus we use uv instead with the `--with` flag.
+   ```bash
+   # Run the inspector with `uv run --with <dependencies> -- python3 <script>`
+   npx @modelcontextprotocol/inspector uv run --with httpx,python-dotenv,pydantic,mcp,pyyaml -- python3 lightrag_mcp.py
+   ```
+
+   Even if you have your virtual environment active, the `python` command as executed by the inspector will not correctly point    to the interpreter with the necessary dependencies, thus we use uv instead with the `--with` flag.
 
 2. **Interact with the Server:**
-    Once the inspector starts, you can click the "Connect" button to establish a session with your server. You can then use commands like `list_tools` and `call_tool` to interact with it.
+   Once the inspector starts, you can click the "Connect" button to establish a session with your server. You can then use commands like `list_tools` and `call_tool` to interact with it.
 
-**Example session:**
+     **Example session:**
 
-```bash
-# List all available tools
-> list_tools
+     ```bash
+     # List all available tools
+     > list_tools
+     
+     # Call the 'health' tool to check the connection to the LightRAG API
+     > call_tool health
+     
+     # Call the 'query' tool with arguments
+     > call_tool query '''{"query": "What is LightRAG?", "mode": "hybrid"}'''
+     ```
 
-# Call the 'health' tool to check the connection to the LightRAG API
-> call_tool health
-
-# Call the 'query' tool with arguments
-> call_tool query '''{"query": "What is LightRAG?", "mode": "hybrid"}'''
-```
-
-This provides a reliable way to test all the tools and verify that the server is working as expected.
+     This provides a reliable way to test all the tools and verify that the server is working as expected.
 
 ## Configuration
 
@@ -99,23 +100,27 @@ The server can be configured using a `config.yaml` file, command-line flags, env
 
 The easiest way to manage your tools is with the `config.yaml` file. It allows you to enable or disable tools by adding or removing them from a list. Each tool is commented with a description of its function.
 
-By default, the the following tools are enabled:
+  **Default configuration:**
 
-- `query`
-- `documents_upload_file`
-- `documents_upload_files`
-- `documents_insert_text`
-- `documents_scan`
-- `graphs_get`
-- `graph_labels`
-- `graph_entity_exists`
-- `graph_update_entity`
-- `graph_update_relation`
-- `documents_pipeline_status`
-- `documents_delete_entity`
-- `documents_delete_relation`
+  By default, the the following tools are enabled:
 
-To enable other tools, simply uncomment them in the `enabled_tools` list in your `config.yaml` file.
+  ```yaml
+  - `query`
+  - `documents_upload_file`
+  - `documents_upload_files`
+  - `documents_insert_text`
+  - `documents_scan`
+  - `graphs_get`
+  - `graph_labels`
+  - `graph_entity_exists`
+  - `graph_update_entity`
+  - `graph_update_relation`
+  - `documents_pipeline_status`
+  - `documents_delete_entity`
+  - `documents_delete_relation`
+  ```
+
+  To enable other tools, simply uncomment them in the `enabled_tools` list in your `config.yaml` file.
 
 ### Environment Variables
 
@@ -123,13 +128,13 @@ To enable other tools, simply uncomment them in the `enabled_tools` list in your
 - `LIGHTRAG_API_KEY`: The API key for your LightRAG instance, if required.
 - `LIGHTRAG_TOOLS`: A comma-separated list of tools to enable (e.g., `query,documents_scan`).
 
-**Example `.env` file:**
-
-```bash
-LIGHTRAG_BASE_URL=http://localhost:9621
-LIGHTRAG_API_KEY=your-secret-api-key
-LIGHTRAG_TOOLS=query,documents_scan,graphs_get
-```
+  **Example `.env` file:**
+  
+  ```bash
+  LIGHTRAG_BASE_URL=http://localhost:9621
+  LIGHTRAG_API_KEY=your-secret-api-key
+  LIGHTRAG_TOOLS=query,documents_scan,graphs_get
+  ```
 
 ## Usage with an MCP Client (VS Code Example)
 
