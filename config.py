@@ -52,8 +52,10 @@ def resolve_config() -> tuple[str, Optional[str], List[str]]:
     env_key = os.getenv("LIGHTRAG_API_KEY")
     env_tools = os.getenv("LIGHTRAG_TOOLS")
 
-    # Load from config.yaml
-    yaml_tools = _load_tools_from_yaml('config.yaml')
+    # Load from config.yaml, making path relative to this script
+    script_dir = os.path.dirname(os.path.abspath(__file__))
+    config_path = os.path.join(script_dir, 'config.yaml')
+    yaml_tools = _load_tools_from_yaml(config_path)
 
     # Determine the source for tools
     if yaml_tools is not None:
